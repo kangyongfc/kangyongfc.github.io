@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>강용FC U10 경기 영상</title>
+<meta name="description" content="강용FC U10 경기 영상 모음">
+<meta name="theme-color" content="#1e5e3b">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="강용FC U10">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<style>
+:root{--bg:#f4f6f4;--card:#fff;--ink:#16201a;--sub:#66736b;--line:#e2e8e3;--brand:#1e5e3b;--chip:#e8f1ea;--opp:#8a5a00;--oppbg:#fbf1e1}
+@media (prefers-color-scheme:dark){:root{--bg:#0f1411;--card:#18201b;--ink:#e8efe9;--sub:#93a198;--line:#26302a;--brand:#6fcf97;--chip:#1f2e25;--opp:#e3b26a;--oppbg:#2b2417}}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;-webkit-text-size-adjust:100%}
+.wrap{max-width:720px;margin:0 auto}
+header{position:sticky;top:0;z-index:5;background:var(--bg);padding:calc(14px + env(safe-area-inset-top)) 16px 10px;border-bottom:1px solid var(--line)}
+h1{font-size:19px;margin:0 0 10px;color:var(--brand);letter-spacing:-.3px;display:flex;align-items:center;gap:10px}
+.logo{width:38px;height:auto;flex:none}
+.row{display:flex;gap:8px}
+select,input{flex:1;min-width:0;font-size:16px;padding:11px 12px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--ink);appearance:none;-webkit-appearance:none;font-family:inherit}
+select{background-image:linear-gradient(45deg,transparent 50%,var(--sub) 50%),linear-gradient(135deg,var(--sub) 50%,transparent 50%);background-position:calc(100% - 16px) 50%,calc(100% - 11px) 50%;background-size:5px 5px;background-repeat:no-repeat;padding-right:28px}
+input{margin-top:8px;width:100%}
+.meta{display:flex;justify-content:space-between;align-items:center;margin-top:8px;font-size:13px;color:var(--sub);min-height:22px}
+.reset{border:0;background:none;color:var(--brand);font-size:13px;padding:4px 0;font-weight:600;font-family:inherit}
+main{padding:4px 16px calc(40px + env(safe-area-inset-bottom))}
+.month{font-size:13px;font-weight:700;color:var(--sub);margin:18px 2px 8px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:10px}
+.top{display:flex;justify-content:space-between;gap:8px;font-size:13px;color:var(--sub)}
+.tour{text-align:right}
+.opp{font-size:18px;font-weight:700;margin:4px 0 10px;letter-spacing:-.3px}
+.vids{display:flex;flex-wrap:wrap;gap:8px}
+.vids a{display:inline-flex;align-items:center;min-height:40px;padding:0 14px;border-radius:20px;background:var(--chip);color:var(--brand);font-weight:600;font-size:15px;text-decoration:none}
+.vids a.o{background:var(--oppbg);color:var(--opp)}
+.memo{margin-top:10px;font-size:13px;color:var(--sub)}
+.empty{text-align:center;color:var(--sub);padding:40px 0;line-height:1.6}
+.empty button{margin-top:10px;border:1px solid var(--line);background:var(--card);color:var(--brand);border-radius:12px;padding:10px 16px;font-size:15px;font-weight:600;font-family:inherit}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <h1><img class="logo" src="logo.png" alt="">강용FC U10 경기 영상</h1>
+  <div class="row">
+    <select id="team" aria-label="상대팀"><option value="">상대팀 전체</option></select>
+    <select id="tour" aria-label="대회"><option value="">대회 전체</option></select>
+  </div>
+  <input id="q" type="search" placeholder="팀·대회 이름으로 찾기" aria-label="검색">
+  <div class="meta"><span id="count">불러오는 중…</span><button class="reset" id="reset">처음으로</button></div>
+</header>
+<main id="list"></main>
+</div>
+<script>
+var API='https://script.google.com/macros/s/AKfycbzt1f7D6-LSKLjfGuph3U6JHtp3PISd7VfN16k2m_ybzXLd4WfmndDZwCNEoOC23d0ENQ/exec?format=json';
+var CACHE_KEY='kyfc-games-v1';
+var G=[];
+var team=document.getElementById('team'),tour=document.getElementById('tour'),q=document.getElementById('q');
+var list=document.getElementById('list'),count=document.getElementById('count'),reset=document.getElementById('reset');
+
+function uniq(a){return a.filter(function(x,i){return x&&a.indexOf(x)===i}).sort(function(x,y){return x.localeCompare(y,'ko')})}
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+
+function fillSelect(sel,vals,first){
+  var cur=sel.value; sel.innerHTML='';
+  sel.add(new Option(first,''));
+  vals.forEach(function(v){sel.add(new Option(v,v))});
+  if(vals.indexOf(cur)>=0) sel.value=cur;
+}
+
+function render(){
+  var T=team.value,U=tour.value,Q=q.value.trim().toLowerCase(),html='',last='',n=0;
+  G.forEach(function(g){
+    if(T&&g.o!==T)return; if(U&&g.t!==U)return;
+    if(Q&&(g.o+' '+g.t+' '+g.g+' '+g.memo).toLowerCase().indexOf(Q)<0)return;
+    n++;
+    if(g.m!==last){html+='<div class="month">'+esc(g.m)+'</div>';last=g.m}
+    html+='<div class="card"><div class="top"><span>'+esc(g.d)+'</span><span class="tour">'+esc([g.t,g.g].filter(Boolean).join(' '))+'</span></div>'
+      +'<div class="opp">vs '+esc(g.o||'-')+'</div><div class="vids">'
+      +(g.v||[]).map(function(v){return '<a target="_blank" rel="noopener" class="'+(String(v[0]).indexOf('📹')===0?'o':'')+'" href="'+esc(v[1])+'">'+esc(v[0])+'</a>'}).join('')
+      +'</div>'+(g.memo?'<div class="memo">'+esc(g.memo)+'</div>':'')+'</div>';
+  });
+  list.innerHTML=html||'<div class="empty">해당하는 경기가 없어요</div>';
+  count.textContent='경기 '+n+'개';
+  reset.style.visibility=(T||U||Q)?'visible':'hidden';
+}
+
+function setData(games){
+  G=games||[];
+  fillSelect(team,uniq(G.map(function(g){return g.o})),'상대팀 전체');
+  fillSelect(tour,uniq(G.map(function(g){return g.t})),'대회 전체');
+  render();
+}
+
+function load(){
+  var cached=null;
+  try{cached=JSON.parse(localStorage.getItem(CACHE_KEY)||'null')}catch(e){}
+  if(cached&&cached.length) setData(cached);
+  fetch(API,{cache:'no-store'}).then(function(r){if(!r.ok)throw new Error(r.status);return r.json()}).then(function(games){
+    setData(games);
+    try{localStorage.setItem(CACHE_KEY,JSON.stringify(games))}catch(e){}
+  }).catch(function(){
+    if(!G.length){
+      count.textContent='';
+      list.innerHTML='<div class="empty">영상 목록을 불러오지 못했어요.<br>인터넷 연결을 확인해 주세요.<br><button id="retry">다시 시도</button></div>';
+      document.getElementById('retry').onclick=function(){count.textContent='불러오는 중…';list.innerHTML='';load()};
+    }
+  });
+}
+
+team.onchange=tour.onchange=render; q.oninput=render;
+reset.onclick=function(){team.value='';tour.value='';q.value='';render();window.scrollTo(0,0)};
+reset.style.visibility='hidden';
+load();
+if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){})})}
+</script>
+</body>
+</html>
