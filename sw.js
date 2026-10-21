@@ -1,5 +1,5 @@
 // 앱 화면(파일)만 저장해 두고, 영상 목록은 항상 새로 받아옵니다.
-const CACHE = 'kyfc-shell-v1';
+const CACHE = 'kyfc-shell-v2';
 const SHELL = ['./', 'index.html', 'manifest.webmanifest', 'logo.png', 'favicon.png', 'icon-192.png', 'apple-touch-icon.png'];
 
 self.addEventListener('install', e => {
