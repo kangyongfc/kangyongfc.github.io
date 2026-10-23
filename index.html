@@ -31,8 +31,9 @@ input{margin-top:8px;width:100%}
 main{padding:4px 16px calc(40px + env(safe-area-inset-bottom))}
 .month{font-size:13px;font-weight:700;color:var(--sub);margin:18px 2px 8px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:10px}
-.top{display:flex;justify-content:space-between;gap:8px;font-size:13px;color:var(--sub)}
-.tour{text-align:right}
+.top{display:grid;grid-template-columns:12.5em auto;column-gap:10px;align-items:baseline;font-size:14px;white-space:nowrap}
+.tour{font-weight:700;color:var(--brand);overflow:hidden;text-overflow:ellipsis;min-width:0}
+.date{color:var(--sub);font-size:13px;font-variant-numeric:tabular-nums}
 .opp{font-size:18px;font-weight:700;margin:4px 0 10px;letter-spacing:-.3px}
 .vids{display:flex;flex-wrap:wrap;gap:8px}
 .vids a{display:inline-flex;align-items:center;min-height:40px;padding:0 14px;border-radius:20px;background:var(--chip);color:var(--brand);font-weight:600;font-size:15px;text-decoration:none}
@@ -95,7 +96,7 @@ function render(){
     if(Q&&(g.o+' '+g.t+' '+g.g+' '+g.memo).toLowerCase().indexOf(Q)<0)return;
     n++;
     if(g.m!==last){html+='<div class="month">'+esc(g.m)+'</div>';last=g.m}
-    html+='<div class="card"><div class="top"><span>'+esc(g.d)+'</span><span class="tour">'+esc([g.t,g.g].filter(Boolean).join(' '))+'</span></div>'
+    html+='<div class="card"><div class="top"><span class="tour">'+esc([g.t,g.g].filter(Boolean).join(' '))+'</span><span class="date">'+esc(g.d)+'</span></div>'
       +'<div class="opp">vs '+esc(g.o||'-')+'</div><div class="vids">'
       +(g.v||[]).map(function(v){return '<a target="_blank" rel="noopener" class="'+(String(v[0]).indexOf('📹')===0?'o':'')+'" href="'+esc(v[1])+'">'+esc(v[0])+'</a>'}).join('')
       +'</div>'+(g.memo?'<div class="memo">'+esc(g.memo)+'</div>':'')+'</div>';
