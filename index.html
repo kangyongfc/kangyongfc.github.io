@@ -32,7 +32,7 @@ input{margin-top:8px;width:100%}
 .meta{display:flex;justify-content:space-between;align-items:center;margin-top:8px;font-size:13px;color:var(--sub);min-height:22px}
 .reset{border:0;background:none;color:var(--brand);font-size:13px;padding:4px 0;font-weight:600;font-family:inherit}
 .acts{display:flex;align-items:center;gap:14px}
-.refresh{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--line);background:var(--card);color:var(--brand);font-size:13px;font-weight:600;font-family:inherit;padding:6px 11px;border-radius:999px;cursor:pointer}
+.refresh{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--line);background:var(--card);color:var(--brand);font-size:13px;font-weight:600;font-family:inherit;width:34px;height:34px;justify-content:center;padding:0;border-radius:999px;cursor:pointer}
 .refresh.spin svg{animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 main{padding:4px 16px calc(40px + env(safe-area-inset-bottom))}
@@ -75,7 +75,7 @@ main{padding:4px 16px calc(40px + env(safe-area-inset-bottom))}
     <select id="tour" aria-label="대회"><option value="">대회 전체</option></select>
   </div>
   <input id="q" type="search" placeholder="팀·대회 이름으로 찾기" aria-label="검색">
-  <div class="meta"><span id="count">불러오는 중…</span><span class="acts"><button class="reset" id="reset">처음으로</button><button class="refresh" id="refresh" aria-label="새로고침"><svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.34-5.66" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><path d="M20 4v5h-5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>새로고침</span></button></span></div>
+  <div class="meta"><span id="count">불러오는 중…</span><span class="acts"><button class="reset" id="reset">처음으로</button><button class="refresh" id="refresh" aria-label="새로고침"><svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.34-5.66" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><path d="M20 4v5h-5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button></span></div>
 </header>
 <main id="list"></main>
 </div>
@@ -170,7 +170,7 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){navig
 // 새로고침: 앱 화면과 영상 목록을 모두 최신으로
 document.getElementById('refresh').onclick=function(){
   var btn=this; if(btn.classList.contains('spin'))return;
-  btn.classList.add('spin'); btn.querySelector('span').textContent='업데이트 중…';
+  btn.classList.add('spin');
   var done=function(){location.reload()};
   var p=('serviceWorker' in navigator)?navigator.serviceWorker.getRegistration().then(function(r){return r&&r.update()}).catch(function(){}):Promise.resolve();
   var key=getKey();
